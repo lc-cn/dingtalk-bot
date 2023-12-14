@@ -8,7 +8,7 @@
 5. 发布机器人
 ## install
 ```shell
-npm i dingtalk-bot
+npm install dingtalk-bot
 ```
 ## usage
 ```javascript
