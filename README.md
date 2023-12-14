@@ -8,11 +8,11 @@
 5. 发布机器人
 ## install
 ```shell
-npm install dingtalk-bot
+npm install node-dd-bot
 ```
 ## usage
 ```javascript
-const {Bot}=require('dingtalk-bot')
+const {Bot}=require('node-dd-bot')
 const bot=new Bot({
     clientId:'',
     clientSecret:''
