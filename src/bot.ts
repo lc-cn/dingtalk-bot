@@ -23,6 +23,7 @@ export class Bot extends EventEmitter {
         this.sessionManager = new SessionManager(this)
         this.request.interceptors.request.use((config) => {
             config.headers.set('Authorization', `Bot ${this.sessionManager.access_token}`)
+            config.headers.set('x-acs-dingtalk-access-token',this.sessionManager.access_token)
             return config
         })
     }

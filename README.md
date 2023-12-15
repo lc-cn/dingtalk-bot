@@ -14,8 +14,8 @@ npm install node-dd-bot
 ```javascript
 const {Bot}=require('node-dd-bot')
 const bot=new Bot({
-    clientId:'',
-    clientSecret:''
+	clientId:'',
+	clientSecret:''
 })
 bot.on('message.group',(e)=>{
 	e.reply('hello world')
@@ -27,8 +27,8 @@ bot.sendPrivateMsg('user_id',[
 	'你好呀',
 	{
 		type:'image',
-        url:'https://foo.bar/img.jpg'
-    }
+		url:'https://foo.bar/img.jpg'
+	}
 ])
 
 bot.sendGroupMsg('converationId',[
