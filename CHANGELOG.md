@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.3...v1.0.4) (2023-12-15)
+
+
+### Bug Fixes
+
+* 网络图片处理 ([744e390](https://github.com/lc-cn/dingtalk-bot/commit/744e390abb32def8ba5c5eb6fd310f188e0f38d6))
+
 ## [1.0.3](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.2...v1.0.3) (2023-12-15)
 
 
