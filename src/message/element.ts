@@ -141,11 +141,11 @@ registerConverter('text', (elem) => {
     return ['sampleText', {content: elem.text}]
 })
 registerConverter('image', async (elem, bot) => {
-    const imageMedia = await bot.uploadMedia(elem.url)
+    const imageMedia = await bot.uploadMedia(elem.url,'image')
     return [
         'sampleImageMsg',
         {
-            photoURL: imageMedia.id
+            photoURL: imageMedia.media_id
         }
     ]
 })
@@ -179,9 +179,9 @@ registerConverter('action', (elem) => {
     return [`sampleActionCard${elem.buttons?.length||''}`,result]
 })
 registerConverter('audio', async (elem, bot) => {
-    const media = await bot.uploadMedia(elem.url)
+    const media = await bot.uploadMedia(elem.url,'voice')
     return ['sampleAudio',{
-        mediaId: media.id,
+        mediaId: media.media_id,
         duration: elem.duration + ''
     }]
 })
@@ -196,21 +196,21 @@ registerConverter('confirm', (elem, bot) => {
     }]
 })
 registerConverter('video', async (elem, bot) => {
-    const videoMedia = await bot.uploadMedia(elem.url)
-    const thumbMedia = await bot.uploadMedia(elem.thumb)
+    const videoMedia = await bot.uploadMedia(elem.url,'video')
+    const thumbMedia = await bot.uploadMedia(elem.thumb,'image')
     return ['sampleVideo',{
-        videoMediaId: videoMedia.id,
+        videoMediaId: videoMedia.media_id,
         duration: elem.duration + '',
         videoType: 'mp4',
         width: elem.width,
         height: elem.height,
-        picMediaId: thumbMedia.id
+        picMediaId: thumbMedia.media_id
     }]
 })
 registerConverter('file', async (elem, bot) => {
-    const fileMedia = await bot.uploadMedia(elem.url)
+    const fileMedia = await bot.uploadMedia(elem.url,'file')
     return ['sampleFile',{
-        mediaId: fileMedia.id,
+        mediaId: fileMedia.media_id,
         fineName: elem.name,
         fileType: fileMedia.type
     }]

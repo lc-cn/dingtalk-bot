@@ -6,7 +6,6 @@ import axios,{AxiosInstance} from 'axios'
 import {SessionManager} from '@/sessionManager';
 import {Sendable} from '@/message/element';
 import * as path from "path";
-import * as os from "os";
 import {Sender} from "@/sender";
 import {Dict} from "@/types";
 import {md5} from "@/utils";
@@ -18,6 +17,8 @@ export class Bot extends EventEmitter {
 
     constructor(public options: Bot.Options) {
         super();
+        this.options.data_dir=this.options.data_dir||path.resolve(process.cwd(),'data')
+        if(!fs.existsSync(this.options.data_dir)) fs.mkdirSync(this.options.data_dir)
         this.request = axios.create({
             baseURL: 'https://api.dingtalk.com',
         })
@@ -29,16 +30,22 @@ export class Bot extends EventEmitter {
         })
     }
 
-    private async saveToTemp(file: string) {
+    private async saveToLocal(file: string) {
         const response = await this.request.get(file, {
-            responseType: 'blob'
+            responseType: 'stream'
         })
-        const fileData = Buffer.from(response.data)
-        const [fileType]=String(response.headers["Content-Type"]||file).split('/').reverse()
-        const fileInfo=`${md5(fileData)}.${fileType}`
-        const saveTo = path.resolve(os.tmpdir(), fileInfo)
-        fs.writeFileSync(saveTo, fileData)
-        return saveTo
+        const [fileType]=String(response.headers["Content-Type"]||response.headers["content-type"]||file).split('/').reverse()
+        const fileInfo=`${Math.random().toString(36)}.${fileType}`
+        const saveTo = path.resolve(this.options.data_dir, fileInfo)
+        response.data.pipe(fs.createWriteStream(saveTo))
+        return new Promise<string>((resolve,reject)=>{
+            response.data.on('end', () => {
+                resolve(saveTo)
+            })
+            response.data.on('error', () => {
+                reject()
+            })
+        })
     }
     async downloadFile(downloadCode:string):Promise<{ downloadUrl:string }>{
         const {data}= await this.request.post('/v1.0/robot/messageFiles/download',{
@@ -64,14 +71,14 @@ export class Bot extends EventEmitter {
             prefix = fullEventName
         }
     }
-    async uploadMedia(file: string) {
-        if (file.startsWith('http')) file = await this.saveToTemp(file)
+    async uploadMedia(file: string,mediaType:'image'|'video'|'voice'|'file') {
+        if (file.startsWith('http')) file = await this.saveToLocal(file)
         const formData = new FormData()
         const [type] = file.split('.').reverse()
         const headers = formData.getHeaders()
         const fileData = fs.createReadStream(file)
         formData.append('media', fileData)
-        formData.append('type', type)
+        formData.append('type', mediaType)
         return new Promise<Bot.MediaInfo>((resolve, reject) => {
             formData.getLength(async (e, l) => {
                 if (e) return reject(e)
@@ -115,6 +122,7 @@ export namespace Bot {
     export interface Options {
         clientId: string
         clientSecret: string
+        data_dir?:string
         reconnect_interval?: number
         max_reconnect_count?: number
         heartbeat_interval?: number
@@ -122,7 +130,7 @@ export namespace Bot {
         sandbox?: boolean
     }
     export type MediaInfo={
-        id:string
+        media_id:string
         type:string
     }
     export interface Token {
