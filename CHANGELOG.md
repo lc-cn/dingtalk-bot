@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.2...v1.0.3) (2023-12-15)
+
+
+### Bug Fixes
+
+* 随机文件处理 ([ff8d301](https://github.com/lc-cn/dingtalk-bot/commit/ff8d3015f955d2508165ffdd75e799493d17a0cb))
+
 ## [1.0.2](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.1...v1.0.2) (2023-12-15)
 
 
