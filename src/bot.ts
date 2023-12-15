@@ -9,6 +9,7 @@ import * as path from "path";
 import * as os from "os";
 import {Sender} from "@/sender";
 import {Dict} from "@/types";
+import {md5} from "@/utils";
 
 export class Bot extends EventEmitter {
     request: AxiosInstance
@@ -33,7 +34,8 @@ export class Bot extends EventEmitter {
             responseType: 'blob'
         })
         const fileData = Buffer.from(response.data)
-        const [fileInfo] = file.split('/').reverse()
+        const [fileType]=String(response.headers["Content-Type"]||file).split('/').reverse()
+        const fileInfo=`${md5(fileData)}.${fileType}`
         const saveTo = path.resolve(os.tmpdir(), fileInfo)
         fs.writeFileSync(saveTo, fileData)
         return saveTo
@@ -63,7 +65,7 @@ export class Bot extends EventEmitter {
         }
     }
     async uploadMedia(file: string) {
-        if (file.split('http')) file = await this.saveToTemp(file)
+        if (file.startsWith('http')) file = await this.saveToTemp(file)
         const formData = new FormData()
         const [type] = file.split('.').reverse()
         const headers = formData.getHeaders()
