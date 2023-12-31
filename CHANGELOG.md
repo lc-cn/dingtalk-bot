@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.4...v1.0.5) (2023-12-31)
+
+
+### Bug Fixes
+
+* 增加消息撤回功能，增加类型声明，图片支持base64、Buffer ([039ba5a](https://github.com/lc-cn/dingtalk-bot/commit/039ba5af612c1c9cc9734b5127aa0a2deaa2af6c))
+
 ## [1.0.4](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.3...v1.0.4) (2023-12-15)
 
 
