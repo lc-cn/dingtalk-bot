@@ -3,6 +3,7 @@ import {MessageElem} from "@/message/element";
 import {Bot} from "@/bot";
 export type DwClientMessage={
     conversationId:string
+    messageId:string
     conversationType:"1"|"2"
     chatbotCorpId:string
     senderNick:string
@@ -44,7 +45,7 @@ async function parseFromRichText(this:Bot,list:Dict[]):Promise<MessageElem[]>{
                 const imageInfo=await this.downloadFile(item.downloadCode)
                 result.push({
                     type:'image',
-                    url:imageInfo.downloadUrl
+                    file:imageInfo.downloadUrl
                 })
                 break;
             default:

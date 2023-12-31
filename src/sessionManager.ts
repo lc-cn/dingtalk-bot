@@ -1,11 +1,13 @@
 import {EventEmitter} from "events";
 import {WebSocket} from 'ws'
 import {Bot} from "@/bot";
-import {MessageEvent} from "@/event/message";
+import {Message} from "@/event";
 
 export interface DwClientDownStream{
   specVersion: string;
   type: string;
+  appId?:string
+  messageId?:string
   headers: {
     appId: string;
     connectionId: string;
@@ -69,8 +71,12 @@ export class SessionManager extends EventEmitter {
   }
   async handleCallback(message:DwClientDownStream){
     const payload=JSON.parse(message.data)
-    const messageEvent=await MessageEvent.from.bind(this.bot)(payload)
-    console.debug(`receive ${messageEvent.message_type} message from ${messageEvent.message_id}: ${messageEvent.raw_message}`)
+    const messageEvent=await Message.fromEvent.bind(this.bot)(message.messageId!,payload)
+    if(messageEvent.message_type==="group"){
+      this.bot.logger.info(`recv: [Group(${messageEvent.message_id}),Member(${messageEvent.sender.user_id})] ${messageEvent.raw_message}`)
+    }else{
+      this.bot.logger.info(`recv: [Private(${messageEvent.sender.user_id})] ${messageEvent.raw_message}`)
+    }
     this.bot.em(`message.${messageEvent.message_type}`,messageEvent)
   }
   private handleWsMsg(data:string){
@@ -158,9 +164,12 @@ export class SessionManager extends EventEmitter {
   async start() {
     await this.getAccessToken();
     await this.getWsUrl();
-    this.connect();
+    return new Promise<void>(resolve =>{
+      this.bot.once('system.online',resolve)
+      this.connect();
+    })
   }
-  stop(){
+  async stop(){
     this.stopEd=true
     this.bot.ws?.close()
   }
@@ -169,17 +178,18 @@ export class SessionManager extends EventEmitter {
     this.bot.ws = new WebSocket(this.wsUrl!, {
       rejectUnauthorized:true
     });
-    this.bot.ws.on('open',()=>{
+    this.bot.ws.on('open',(data)=>{
       this.isAlive=true
       this.connected=true
       this.reconnect_count=0;
-      console.debug(`bot ${this.bot.options.clientId} online success`)
+      this.bot.emit('system.online')
+      this.bot.logger.info(`online success`)
       this.heartbeat_timer=setInterval(()=>{
         this.isAlive=false;
         this.bot.ws?.ping('',true)
       },this.bot.options.heartbeat_interval||3000)
     })
-    this.bot.ws.on('pong',()=>{
+    this.bot.ws.on('pong',(data)=>{
       this.isAlive=true
     })
     this.bot.ws.on('message',(data)=>{
@@ -196,7 +206,7 @@ export class SessionManager extends EventEmitter {
       },this.bot.options.reconnect_interval||3000)
     })
     this.bot.ws.on('error',(e)=>{
-      console.log(e)
+      this.bot.logger.error(e)
     })
   }
 

@@ -17,7 +17,11 @@ export interface ElementMap {
         content: string
     }
     image: {
-        url: string
+        file:string
+        name?:string
+    }|{
+        file:Buffer
+        name:string
     }
     link: {
         text: string
@@ -121,7 +125,7 @@ export type MessagePayload = {
     videoType?: string
     picMediaId?: string
 }
-type ConvertResult = [string, MessagePayload]
+type ConvertResult = [string, MessagePayload,string]
 type OriginConverter<T extends MessageElem = MessageElem> = (element: T, bot: Bot) => ConvertResult | Promise<ConvertResult>
 export const originTypeConverterMap: Map<string, OriginConverter> = new Map<string, OriginConverter>()
 export function getConverter<T extends MessageElem>(elem:T):OriginConverter<T>|undefined{
@@ -138,15 +142,18 @@ export function registerConverter<T extends ElementType, E extends MessageElem<T
 }
 
 registerConverter('text', (elem) => {
-    return ['sampleText', {content: elem.text}]
+    return ['sampleText', {content: elem.text},elem.text]
 })
 registerConverter('image', async (elem, bot) => {
-    const imageMedia = await bot.uploadMedia(elem.url,'image')
+    const imageMedia = Buffer.isBuffer(elem.file)?
+        await bot.uploadMedia(elem.file,elem.name,'image'):
+        await bot.uploadMedia(elem.file,'image')
     return [
         'sampleImageMsg',
         {
             photoURL: imageMedia.media_id
-        }
+        },
+        `[Image:${imageMedia.media_id}]`
     ]
 })
 registerConverter('markdown', (elem) => {
@@ -155,7 +162,8 @@ registerConverter('markdown', (elem) => {
         {
             title: elem.title,
             text: elem.content
-        }
+        },
+        `[Markdown:${elem.title}]`
     ]
 })
 
@@ -164,7 +172,7 @@ registerConverter('link', (elem, bot) => (['sampleLink',{
     text: elem.text,
     picUrl: elem.thumb,
     messageUrl: elem.href
-}]))
+},`[Link:${elem.href}]`]))
 registerConverter('action', (elem) => {
     const result: MessagePayload = {
         title: elem.title,
@@ -176,14 +184,14 @@ registerConverter('action', (elem) => {
         result[titleKey] = button.title
         result[urlKey] = button.url
     }
-    return [`sampleActionCard${elem.buttons?.length||''}`,result]
+    return [`sampleActionCard${elem.buttons?.length||''}`,result,`[Action:${elem.title}]`]
 })
 registerConverter('audio', async (elem, bot) => {
     const media = await bot.uploadMedia(elem.url,'voice')
     return ['sampleAudio',{
         mediaId: media.media_id,
         duration: elem.duration + ''
-    }]
+    },`[${Audio}:${media.media_id}]`]
 })
 registerConverter('confirm', (elem, bot) => {
     return ['sampleActionCard6',{
@@ -193,7 +201,7 @@ registerConverter('confirm', (elem, bot) => {
         buttonURL1: elem.yesUrl,
         buttonTitle2: elem.noText,
         buttonURL2: elem.noUrl
-    }]
+    },`[Confirm:${elem.title}]`]
 })
 registerConverter('video', async (elem, bot) => {
     const videoMedia = await bot.uploadMedia(elem.url,'video')
@@ -205,7 +213,7 @@ registerConverter('video', async (elem, bot) => {
         width: elem.width,
         height: elem.height,
         picMediaId: thumbMedia.media_id
-    }]
+    },`[Video:${videoMedia.media_id}]`]
 })
 registerConverter('file', async (elem, bot) => {
     const fileMedia = await bot.uploadMedia(elem.url,'file')
@@ -213,6 +221,6 @@ registerConverter('file', async (elem, bot) => {
         mediaId: fileMedia.media_id,
         fineName: elem.name,
         fileType: fileMedia.type
-    }]
+    },`[File:${fileMedia.media_id}]`]
 })
 
