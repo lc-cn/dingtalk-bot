@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.5...v1.0.6) (2024-01-05)
+
+
+### Bug Fixes
+
+* 导出消息类型 ([34a4ad5](https://github.com/lc-cn/dingtalk-bot/commit/34a4ad588fa2513875d441cfcc0a9b8ff2643e1a))
+
 ## [1.0.5](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.4...v1.0.5) (2023-12-31)
 
 
