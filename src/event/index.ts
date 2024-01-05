@@ -6,3 +6,4 @@ export interface EventMap{
     'message.group'(e:GroupMessageEvent):void
     'message.private'(e:PrivateMessageEvent):void
 }
+export * from './message'
