@@ -21,7 +21,7 @@ export class Message {
     raw_message: string = ''
     message_type: 'group' | 'private'
     time: number
-    constructor(public message_id: string, private payload: DwClientMessage) {
+    constructor(public message_id: string, payload: DwClientMessage) {
         this.message_type = payload.conversationType === '1' ? 'private' : 'group'
         this.time = payload.createAt
     }
@@ -30,12 +30,12 @@ export class Message {
         const result = payload.conversationType === '1' ?
             new PrivateMessageEvent(this, messageId, payload) :
             new GroupMessageEvent(this, messageId, payload)
-        await result.parse(this)
+        await result.parse(this,payload)
         return result
     }
 
-    private async parse(bot: Bot) {
-        this.message = await parserMessage(bot, this.payload)
+    private async parse(bot: Bot,payload:DwClientMessage) {
+        this.message = await parserMessage(bot, payload)
         this.raw_message = Message.toRaw(this.message)
     }
 

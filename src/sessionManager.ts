@@ -1,7 +1,7 @@
 import {EventEmitter} from "events";
 import {WebSocket} from 'ws'
 import {Bot} from "@/bot";
-import {Message} from "@/event";
+import {GroupMessageEvent, Message} from "@/event";
 
 export interface DwClientDownStream{
   specVersion: string;
@@ -71,9 +71,9 @@ export class SessionManager extends EventEmitter {
   }
   async handleCallback(message:DwClientDownStream){
     const payload=JSON.parse(message.data)
-    const messageEvent=await Message.fromEvent.bind(this.bot)(message.messageId!,payload)
+    const messageEvent=await Message.fromEvent.bind(this.bot)(payload.msgId,payload)
     if(messageEvent.message_type==="group"){
-      this.bot.logger.info(`recv: [Group(${messageEvent.message_id}),Member(${messageEvent.sender.user_id})] ${messageEvent.raw_message}`)
+      this.bot.logger.info(`recv: [Group(${(messageEvent as GroupMessageEvent).group_id}),Member(${messageEvent.sender.user_id})] ${messageEvent.raw_message}`)
     }else{
       this.bot.logger.info(`recv: [Private(${messageEvent.sender.user_id})] ${messageEvent.raw_message}`)
     }
