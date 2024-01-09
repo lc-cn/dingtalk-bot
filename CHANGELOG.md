@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.7](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.6...v1.0.7) (2024-01-09)
+
+
+### Bug Fixes
+
+* 减少传输数据 ([a2ab013](https://github.com/lc-cn/dingtalk-bot/commit/a2ab013c8f7373b4a81327b21f73beb3d2e95b02))
+
 ## [1.0.6](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.5...v1.0.6) (2024-01-05)
 
 
