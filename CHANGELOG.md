@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.8](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.7...v1.0.8) (2024-01-10)
+
+
+### Bug Fixes
+
+* 撤回消息优化 ([2c032b4](https://github.com/lc-cn/dingtalk-bot/commit/2c032b4c46b60a840f31bea05162e720e998dc5b))
+
 ## [1.0.7](https://github.com/lc-cn/dingtalk-bot/compare/v1.0.6...v1.0.7) (2024-01-09)
 
 
