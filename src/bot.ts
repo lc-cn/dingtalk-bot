@@ -97,12 +97,19 @@ export class Bot extends EventEmitter {
         return new Sender(this, '/v1.0/robot/oToMessages/batchSend', {userIds: [userId]}).sendMsg(message)
     }
     async recallPrivateMsg(user_id:string,message_id:string):Promise<boolean> {
+        const queryKeys:string[]=[]
+        try{
+            const arr=JSON.parse(message_id)
+            if(Array.isArray(arr) && arr.every(str=>typeof str==='string')) queryKeys.push(...arr)
+        }catch {
+            queryKeys.push(message_id)
+        }
         const {data:{successResult=[]}={}}=await this.request.post('/v1.0/robot/otoMessages/batchRecall',{
             openConversationId:user_id,
             robotCode:this.options.clientId,
-            processQueryKeys:[message_id]
+            processQueryKeys:queryKeys
         })
-        return successResult.includes(message_id)
+        return queryKeys.every(str=>successResult.includes(str))
     }
 
     sendGroupMsg(group_id: string, message: Sendable) {
@@ -111,12 +118,19 @@ export class Bot extends EventEmitter {
         }).sendMsg(message)
     }
     async recallGroupMsg(group_id:string,message_id:string):Promise<boolean> {
+        const queryKeys:string[]=[]
+        try{
+            const arr=JSON.parse(message_id)
+            if(Array.isArray(arr) && arr.every(str=>typeof str==='string')) queryKeys.push(...arr)
+        }catch {
+            queryKeys.push(message_id)
+        }
         const {data:{successResult=[]}={}}=await this.request.post('/v1.0/robot/groupMessages/recall',{
             openConversationId:group_id,
             robotCode:this.options.clientId,
-            processQueryKeys:[message_id]
+            processQueryKeys:queryKeys
         })
-        return successResult.includes(message_id)
+        return queryKeys.every(str=>successResult.includes(str))
     }
 
     async start() {
